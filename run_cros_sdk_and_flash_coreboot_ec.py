@@ -6,13 +6,59 @@ import os
 import os
 import sys
 import time
+import zipfile
+import shutil
+import glob
+
 from runMiniBat import RunMiniBat
 
 
 dut_ip = "38.38.38.232"
-test = RunMiniBat()
-
 cros_sdk_path = '/home/cssdesk/google_source'
+
+test = RunMiniBat()
+script_working_directory = os.getcwd()
+
+dir_name = '/home/cssdesk/google_source/src/Binaries/Latest'
+os_compressed_filename = "*.bz2"
+coreboot_compressed_filename = "Amenia_ChromiumOS_Daily_71_image_16MB.zip"
+
+
+def unzip_src_file(dir_name, os_compressed_filename, coreboot_compressed_filename):
+	binary_src_location = dir_name + "/tmp"
+	print binary_src_location
+	if not os.path.exists(binary_src_location):
+	    os.makedirs(binary_src_location)
+
+	filelist = glob.glob(binary_src_location + "/*")
+	for f in filelist:
+	    os.remove(f)
+
+
+	cmd_os_file_decompression = 'bzip2 -dckf ' +  dir_name + "/" + os_compressed_filename +  " > " +  binary_src_location + "/" + "chromium_test_image.bin"
+	os.system(cmd_os_file_decompression)
+
+	#coreboot
+	coreboot_location =  dir_name + "/" + coreboot_compressed_filename
+	print coreboot_location
+	zip_ref = zipfile.ZipFile(coreboot_location, 'r')
+	zip_ref.extractall(binary_src_location)
+	zip_ref.close()
+	for cb in glob.glob(binary_src_location + "/image*.bin"):
+		print cb
+		shutil.move(cb, binary_src_location + "/" + "image.bin")
+
+	#ec
+	for name in glob.glob(dir_name + "/*ec.bin"):
+		print name
+		shutil.copyfile(name, binary_src_location + "/" + "ec.bin")
+	if os.path.isfile(binary_src_location + "/ec.bin") and os.path.isfile(binary_src_location + "/image.bin") and os.path.isfile(binary_src_location + "/chromium_test_image.bin"):
+		return True
+	else:
+		return False
+
+
+
 
 p = subprocess.Popen('pgrep servod', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 retval = p.wait()
@@ -38,7 +84,17 @@ if output:
 	print "Servod started successfully"
 else:
 	print "Servod couldn't be started successfully. Exiting test."
+	exit()
 
+#will flash coreboot and ec
+print "Will prepare BKC images from release folder"
+#cmd_creating_src = "python " + script_working_directory + "/" + "zip_unzip_files.py"
+#os.system(cmd_creating_src)
+if unzip_src_file(dir_name, os_compressed_filename, coreboot_compressed_filename):
+	print "BKC images extracted successfully. Will continue flashing"
+else:
+	print "BKC images are not extracted. Exiting test"
+	exit()
 
 servo_sees_usb_cmd1 = 'python /home/cssdesk/depot_tools/cros_sdk dut-control prtctl4_pwren:off'
 servo_sees_usb_cmd2 = 'python /home/cssdesk/depot_tools/cros_sdk dut-control usb_mux_sel1:servo_sees_usbkey'
