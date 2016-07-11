@@ -12,7 +12,7 @@ os.makedirs(log_collection_folder)
 
 #add the DUT ips to collect log from.
 #data = (['38.38.38.237', log_collection_folder], ['38.38.38.2322', log_collection_folder])
-data = ('38.38.38.237', '38.38.38.232')
+data = ('38.38.38.201', '38.38.38.232')
 def collect_logs_in_parallel_new((dut_ip)):
 	print "collecting logs from: %s" % dut_ip
 	test = RunMiniBat()
