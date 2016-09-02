@@ -17,9 +17,10 @@ logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG, )
 #CONFIG PARAMETERS FOR USER TO CHANGE
 #status_check should be true if tester wants to test system status in every loop else FALSE
 status_check = True
-faft_iterations = 1
-dut_ip = "38.38.38.232"
-cros_sdk_path = '/home/cssdesk/google_source'
+faft_iterations = 500
+dut_ip = "38.38.38.216"
+cros_sdk_path = '/home/csschrome666/google_source'
+abs_cros_sdk_path = '/home/csschrome666/depot_tools/cros_sdk'
 #END CONFIG PARAMETERS FOR USER TO CHANGE
 
 test = RunMiniBat()
@@ -41,7 +42,7 @@ os.chdir(cros_sdk_path)
 print os.getcwd()
 logging.info(os.getcwd())
 
-servod_cmd = 'python ' + '/home/cssdesk/depot_tools/cros_sdk ' + 'sudo ' + 'servod ' + '--board=cyan ' + '&'
+servod_cmd = 'python ' + abs_cros_sdk_path + ' ' + 'sudo ' + 'servod ' + '--board=cyan ' + '&'
 os.system(servod_cmd)
 time.sleep(15)
 
@@ -80,21 +81,24 @@ def status_check():
 if status_check:
 	status_check()
 
-pwr_btn_command = 'python /home/cssdesk/depot_tools/cros_sdk dut-control pwr_button:press sleep:0.5 pwr_button:release'
+pwr_btn_command = 'python' + ' ' + abs_cros_sdk_path + ' ' + 'dut-control pwr_button:press sleep:0.5 pwr_button:release'
+print pwr_btn_command
 for i in xrange(1, faft_iterations+1):
 	print ("STARTING ITERATION %d of %d" % (i, faft_iterations))
 	logging.info("STARTING ITERATION %d of %d" % (i, faft_iterations))
 	print "Sending shutdown command to the DUT"
 	logging.info("Sending shutdown command to the DUT")
 	test.run_command_on_dut("/sbin/shutdown -P now", dut_ip)
-	time.sleep(11)
+	logging.info("Waiting 16 seconds for the system to shutdown.")
+	print ("Waiting 16 seconds for the system to shutdown.")
+	time.sleep(16)
 	if not test.check_if_dut_is_live(dut_ip):	
 		print "system shutdown successful"
 		logging.info("system shutdown successful")
-		ec_uart_capture_enable_command = 'python /home/cssdesk/depot_tools/cros_sdk dut-control ec_uart_capture:on'
-		ec_uart_capture_disable_command = 'python /home/cssdesk/depot_tools/cros_sdk dut-control ec_uart_capture:off'
-		ec_console_system_status_command = 'python /home/cssdesk/depot_tools/cros_sdk dut-control ec_uart_cmd:powerinfo'
-		ec_console_system_status_output = 'python /home/cssdesk/depot_tools/cros_sdk dut-control ec_uart_stream'
+		ec_uart_capture_enable_command = 'python' + ' ' + abs_cros_sdk_path + ' ' + 'dut-control ec_uart_capture:on'
+		ec_uart_capture_disable_command = 'python' + ' ' + abs_cros_sdk_path + ' ' + 'dut-control ec_uart_capture:off'
+		ec_console_system_status_command = 'python' + ' ' + abs_cros_sdk_path + ' ' + 'dut-control ec_uart_cmd:powerinfo'
+		ec_console_system_status_output = 'python' + ' ' + abs_cros_sdk_path + ' ' + 'dut-control ec_uart_stream'
 		os.system(ec_uart_capture_enable_command)
 		os.system(ec_console_system_status_command)
 		system_status_check = os.popen(ec_console_system_status_output).read()
@@ -114,7 +118,9 @@ for i in xrange(1, faft_iterations+1):
 		print "Pressing powerbtn to poweron system"
 		logging.info("Pressing powerbtn to poweron system")
 		os.system(pwr_btn_command)
-		time.sleep(40)
+		logging.info("Waiting 80 seconds for the system to come up.")
+		print ("Waiting 80 seconds for the system to come up.")
+		time.sleep(80)
 		if test.check_if_dut_is_live(dut_ip):
 			print "System on using powerbtn successfull."
 			logging.info("System on using powerbtn successfull.")
