@@ -1,0 +1,7 @@
+In case default paramiko doesn't work
+once you install as below
+
+#sudo apt-get install python-paramiko
+install using below command.
+
+#sudo apt-get install python-ecdsa -y && wget http://ge.archive.ubuntu.com/ubuntu/pool/main/p/paramiko/python-paramiko_1.15.1-1_all.deb && sudo dpkg -i python-paramiko_1.15.1-1_all.deb
