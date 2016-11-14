@@ -1,6 +1,4 @@
-In case default paramiko doesn't work
-once you install as below
-
+In case default paramiko doesn't work once you install as below
 #sudo apt-get install python-paramiko
 install using below command.
 
