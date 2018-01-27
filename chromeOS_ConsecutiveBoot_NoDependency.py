@@ -66,7 +66,7 @@ def status_check():
 	else:
 		print "System is in Normal mode"
 		logging.info("System is in Normal mode.")
-
+	#check for intel platform specific hardware like wireless
 	wifi_check = test.run_command_on_dut('/usr/sbin/lspci | grep -i "intel corporation wireless"', dut_ip)
 	print wifi_check
 	if wifi_check.find("Intel Corporation Wireless") != -1:
