@@ -17,7 +17,7 @@ logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG, )
 #CONFIG PARAMETERS FOR USER TO CHANGE
 #status_check should be true if tester wants to test system status in every loop else FALSE
 status_check = True
-faft_iterations = 500
+faft_iterations = 5000
 dut_ip = "38.38.38.216"
 cros_sdk_path = '/home/csschrome666/google_source'
 abs_cros_sdk_path = '/home/csschrome666/depot_tools/cros_sdk'
